@@ -7,7 +7,7 @@
 </head>
 <body>
 
-  <h1>🛒 Ma boutique en ligne</h1>
+  <h1>🛒 La cave</h1>
 
   <!-- PRODUITS -->
   <h2>Produits</h2>
@@ -16,6 +16,35 @@
   <!-- PANIER -->
   <h2>🛒 Panier</h2>
   <div id="cart"></div>
+
+  async function placeOrder() {
+  if (cart.length === 0) {
+    alert("Panier vide ❌");
+    return;
+  }
+
+  const order = cart.map(id => {
+    const product = products.find(p => p.id === id);
+    return product;
+  });
+
+  const res = await fetch("https://ecommerce-site-nij4.onrender.com/order", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      items: order,
+      total: order.reduce((sum, p) => sum + p.price, 0)
+    })
+  });
+
+  const data = await res.json();
+  alert(data.message);
+
+  cart = [];
+  saveCart();
+}
 
   <script src="script.js"></script>
 </body>
