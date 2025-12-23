@@ -25,19 +25,4 @@ app.get("/products", (req, res) => {
       price: 24.9
     }
   ]);
-});
 
-/* PORT (Render utilise process.env.PORT) */
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
-  console.log("Serveur lancé sur le port", PORT);
-
-app.post("/order", (req, res) => {
-  const order = req.body;
-
-  console.log("📦 Nouvelle commande reçue :", order);
-
-  res.json({
-    message: "Commande reçue avec succès ✅"
-  });
-});
