@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Ajouter produit</title>
+</head>
+<body>
+
+<h1>🛠️ Admin – Ajouter un produit</h1>
+
+<input id="name" placeholder="Nom du produit"><br><br>
+<input id="price" type="number" placeholder="Prix"><br><br>
+
+<button onclick="addProduct()">Ajouter</button>
+
+<p id="message"></p>
+
+<script>
+async function addProduct() {
+  const name = document.getElementById("name").value;
+  const price = document.getElementById("price").value;
+
+  const res = await fetch("https://ecommerce-site-nij4.onrender.com/products", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ name, price })
+  });
+
+  const data = await res.json();
+  document.getElementById("message").innerText = data.message;
+}
+</script>
+
+</body>
+</html>
