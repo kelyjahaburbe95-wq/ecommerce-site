@@ -6,17 +6,41 @@ function saveCart() {
   renderCart();
 }
 
+// ➕ Ajouter au panier
 function addToCart(id) {
-  cart.push(id);
+  const item = cart.find(p => p.id === id);
+
+  if (item) {
+    item.qty++;
+  } else {
+    cart.push({ id, qty: 1 });
+  }
+
   saveCart();
 }
 
-function removeFromCart(index) {
-  cart.splice(index, 1);
-  saveCart();
+// ➕ augmenter quantité
+function increaseQty(id) {
+  const item = cart.find(p => p.id === id);
+  if (item) {
+    item.qty++;
+    saveCart();
+  }
 }
 
-// Charger les produits
+// ➖ diminuer quantité
+function decreaseQty(id) {
+  const item = cart.find(p => p.id === id);
+  if (item) {
+    item.qty--;
+    if (item.qty <= 0) {
+      cart = cart.filter(p => p.id !== id);
+    }
+    saveCart();
+  }
+}
+
+// Charger produits
 async function loadProducts() {
   const res = await fetch("https://ecommerce-site-nij4.onrender.com/products");
   products = await res.json();
@@ -26,7 +50,7 @@ async function loadProducts() {
 
   products.forEach(p => {
     container.innerHTML += `
-      <div style="border:1px solid #ccc; padding:10px; margin:10px;">
+      <div class="product">
         <h3>${p.name}</h3>
         <p>${p.price} €</p>
         <button onclick="addToCart(${p.id})">Ajouter au panier</button>
@@ -37,7 +61,7 @@ async function loadProducts() {
   renderCart();
 }
 
-// Affichage panier
+// 🛒 Affichage panier
 function renderCart() {
   const cartDiv = document.getElementById("cart");
 
@@ -49,14 +73,20 @@ function renderCart() {
   let total = 0;
   cartDiv.innerHTML = "";
 
-  cart.forEach((id, index) => {
-    const product = products.find(p => p.id === id);
+  cart.forEach(item => {
+    const product = products.find(p => p.id === item.id);
     if (product) {
-      total += product.price;
+      const lineTotal = product.price * item.qty;
+      total += lineTotal;
+
       cartDiv.innerHTML += `
         <p>
-          ${product.name} – ${product.price} €
-          <button onclick="removeFromCart(${index})">❌</button>
+          ${product.name} – ${lineTotal} €
+          <span>
+            <button onclick="decreaseQty(${item.id})">−</button>
+            ${item.qty}
+            <button onclick="increaseQty(${item.id})">+</button>
+          </span>
         </p>
       `;
     }
@@ -65,26 +95,17 @@ function renderCart() {
   cartDiv.innerHTML += `<strong>Total : ${total} €</strong>`;
 }
 
-// Commander
+// ✅ Commander
 async function placeOrder() {
   if (cart.length === 0) {
     alert("Panier vide ❌");
     return;
   }
 
-  const orderItems = cart.map(id =>
-    products.find(p => p.id === id)
-  );
-
-  const total = orderItems.reduce((sum, p) => sum + p.price, 0);
-
   const res = await fetch("https://ecommerce-site-nij4.onrender.com/order", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      items: orderItems,
-      total
-    })
+    body: JSON.stringify(cart)
   });
 
   const data = await res.json();
