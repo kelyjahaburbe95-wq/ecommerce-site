@@ -2,12 +2,13 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Admin - Ajouter produit</title>
+  <title>Admin sécurisé</title>
 </head>
 <body>
 
-<h1>🛠️ Admin – Ajouter un produit</h1>
+<h1>🔐 Admin – Ajouter un produit</h1>
 
+<input id="password" type="password" placeholder="Mot de passe admin"><br><br>
 <input id="name" placeholder="Nom du produit"><br><br>
 <input id="price" type="number" placeholder="Prix"><br><br>
 
@@ -17,15 +18,14 @@
 
 <script>
 async function addProduct() {
+  const password = document.getElementById("password").value;
   const name = document.getElementById("name").value;
   const price = document.getElementById("price").value;
 
   const res = await fetch("https://ecommerce-site-nij4.onrender.com/products", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ name, price })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, price, password })
   });
 
   const data = await res.json();
