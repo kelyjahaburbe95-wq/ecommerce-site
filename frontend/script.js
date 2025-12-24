@@ -1,19 +1,22 @@
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let products = [];
 
-// Sauvegarde du panier
 function saveCart() {
   localStorage.setItem("cart", JSON.stringify(cart));
   renderCart();
 }
 
-// Ajouter au panier
 function addToCart(id) {
   cart.push(id);
   saveCart();
 }
 
-// Charger les produits depuis le backend
+function removeFromCart(index) {
+  cart.splice(index, 1);
+  saveCart();
+}
+
+// Charger les produits
 async function loadProducts() {
   const res = await fetch("https://ecommerce-site-nij4.onrender.com/products");
   products = await res.json();
@@ -34,7 +37,7 @@ async function loadProducts() {
   renderCart();
 }
 
-// Afficher le panier
+// Affichage panier
 function renderCart() {
   const cartDiv = document.getElementById("cart");
 
@@ -46,16 +49,49 @@ function renderCart() {
   let total = 0;
   cartDiv.innerHTML = "";
 
-  cart.forEach(id => {
+  cart.forEach((id, index) => {
     const product = products.find(p => p.id === id);
     if (product) {
       total += product.price;
-      cartDiv.innerHTML += `<p>${product.name} – ${product.price} €</p>`;
+      cartDiv.innerHTML += `
+        <p>
+          ${product.name} – ${product.price} €
+          <button onclick="removeFromCart(${index})">❌</button>
+        </p>
+      `;
     }
   });
 
-  cartDiv.innerHTML += `<strong>Total : ${total.toFixed(2)} €</strong>`;
+  cartDiv.innerHTML += `<strong>Total : ${total} €</strong>`;
 }
 
-// Lancer au chargement
+// Commander
+async function placeOrder() {
+  if (cart.length === 0) {
+    alert("Panier vide ❌");
+    return;
+  }
+
+  const orderItems = cart.map(id =>
+    products.find(p => p.id === id)
+  );
+
+  const total = orderItems.reduce((sum, p) => sum + p.price, 0);
+
+  const res = await fetch("https://ecommerce-site-nij4.onrender.com/order", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      items: orderItems,
+      total
+    })
+  });
+
+  const data = await res.json();
+  alert(data.message);
+
+  cart = [];
+  saveCart();
+}
+
 loadProducts();
