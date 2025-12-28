@@ -105,14 +105,23 @@ async function placeOrder() {
   const res = await fetch("https://ecommerce-site-nij4.onrender.com/order", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(cart)
+    body: JSON.stringify({
+      items: cart,
+      total: cart.reduce((sum, item) => {
+        const product = products.find(p => p.id === item.id);
+        return sum + product.price * item.qty;
+      }, 0)
+    })
   });
 
+  if (!res.ok) {
+    alert("Erreur backend ❌");
+    return;
+  }
+
   const data = await res.json();
-  alert(data.message);
+  alert(data.message || "Commande envoyée ✅");
 
   cart = [];
   saveCart();
 }
-
-loadProducts();
