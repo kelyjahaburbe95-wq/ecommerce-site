@@ -1,4 +1,5 @@
-alert("SCRIPT CHARGÉ");
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("JS OK");
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let products = [];
