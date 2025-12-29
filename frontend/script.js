@@ -1,25 +1,24 @@
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let products = [];
 
+// Sauvegarder le panier
 function saveCart() {
   localStorage.setItem("cart", JSON.stringify(cart));
   renderCart();
 }
 
-// ➕ Ajouter au panier
+// Ajouter au panier
 function addToCart(id) {
   const item = cart.find(p => p.id === id);
-
   if (item) {
     item.qty++;
   } else {
     cart.push({ id, qty: 1 });
   }
-
   saveCart();
 }
 
-// ➕ augmenter quantité
+// + quantité
 function increaseQty(id) {
   const item = cart.find(p => p.id === id);
   if (item) {
@@ -28,16 +27,16 @@ function increaseQty(id) {
   }
 }
 
-// ➖ diminuer quantité
+// - quantité
 function decreaseQty(id) {
   const item = cart.find(p => p.id === id);
-  if (item) {
-    item.qty--;
-    if (item.qty <= 0) {
-      cart = cart.filter(p => p.id !== id);
-    }
-    saveCart();
+  if (!item) return;
+
+  item.qty--;
+  if (item.qty <= 0) {
+    cart = cart.filter(p => p.id !== id);
   }
+  saveCart();
 }
 
 // Charger produits
@@ -53,7 +52,7 @@ async function loadProducts() {
       <div class="product">
         <h3>${p.name}</h3>
         <p>${p.price} €</p>
-        <button onclick="addToCart(${p.id})">Ajouter au panier</button>
+        <button onclick="addToCart(${p.id})">Ajouter</button>
       </div>
     `;
   });
@@ -61,7 +60,7 @@ async function loadProducts() {
   renderCart();
 }
 
-// 🛒 Affichage panier
+// Afficher panier
 function renderCart() {
   const cartDiv = document.getElementById("cart");
 
@@ -75,49 +74,46 @@ function renderCart() {
 
   cart.forEach(item => {
     const product = products.find(p => p.id === item.id);
-    if (product) {
-      const lineTotal = product.price * item.qty;
-      total += lineTotal;
+    if (!product) return;
 
-      cartDiv.innerHTML += `
-        <p>
-          ${product.name} – ${lineTotal} €
-          <span>
-            <button onclick="decreaseQty(${item.id})">−</button>
-            ${item.qty}
-            <button onclick="increaseQty(${item.id})">+</button>
-          </span>
-        </p>
-      `;
-    }
+    const line = product.price * item.qty;
+    total += line;
+
+    cartDiv.innerHTML += `
+      <div class="cart-item">
+        <span>${product.name} – ${line} €</span>
+        <span>
+          <button onclick="decreaseQty(${item.id})">−</button>
+          ${item.qty}
+          <button onclick="increaseQty(${item.id})">+</button>
+        </span>
+      </div>
+    `;
   });
 
   cartDiv.innerHTML += `<strong>Total : ${total} €</strong>`;
 }
 
-// ✅ Commander
+// Commander
 async function placeOrder() {
   if (cart.length === 0) {
     alert("Panier vide ❌");
     return;
   }
 
+  const total = cart.reduce((sum, item) => {
+    const p = products.find(pr => pr.id === item.id);
+    return sum + p.price * item.qty;
+  }, 0);
+
   const res = await fetch("https://ecommerce-site-nij4.onrender.com/order", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       items: cart,
-      total: cart.reduce((sum, item) => {
-        const product = products.find(p => p.id === item.id);
-        return sum + product.price * item.qty;
-      }, 0)
+      total
     })
   });
-
-  if (!res.ok) {
-    alert("Erreur backend ❌");
-    return;
-  }
 
   const data = await res.json();
   alert(data.message || "Commande envoyée ✅");
@@ -125,3 +121,9 @@ async function placeOrder() {
   cart = [];
   saveCart();
 }
+
+// 🔥 IMPORTANT : liaison bouton → fonction
+document.getElementById("orderBtn").addEventListener("click", placeOrder);
+
+// Lancer
+loadProducts();
