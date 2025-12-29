@@ -1,96 +1,29 @@
 body {
   font-family: Arial, sans-serif;
-  background: #f4f4f4;
-  margin: 0;
-  padding: 0;
-  text-align: center;
-}
-
-h1 {
-  background: #111;
-  color: white;
-  padding: 20px;
-  margin: 0;
-}
-
-h2 {
-  margin-top: 30px;
-}
-
-#products {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 20px;
+  max-width: 800px;
+  margin: auto;
   padding: 20px;
 }
 
-.product {
-  background: white;
-  border-radius: 10px;
-  width: 200px;
-  padding: 15px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-.product h3 {
-  margin: 10px 0;
-}
-
-.product button {
-  background: #28a745;
-  color: white;
-  border: none;
+.product, .cart-item {
+  border: 1px solid #ddd;
   padding: 10px;
-  width: 100%;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.product button:hover {
-  background: #218838;
-}
-
-#cart {
-  background: white;
-  max-width: 400px;
-  margin: 20px auto;
-  padding: 15px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  text-align: left;
-}
-
-#cart p {
+  margin: 10px 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-#cart button {
-  background: red;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 5px 8px;
+button {
+  padding: 5px 10px;
   cursor: pointer;
 }
 
-#cart button:hover {
-  background: darkred;
-}
-
-button[onclick="placeOrder()"] {
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: 15px 30px;
+#orderBtn {
+  margin-top: 15px;
+  padding: 10px;
   font-size: 16px;
-  border-radius: 10px;
-  cursor: pointer;
-  margin: 20px;
-}
-
-button[onclick="placeOrder()"]:hover {
-  background: #0056b3;
+  background: black;
+  color: white;
+  border: none;
 }
