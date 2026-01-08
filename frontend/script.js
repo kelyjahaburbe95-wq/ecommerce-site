@@ -26,20 +26,23 @@ function renderCart() {
 
   cart.forEach(item => {
     const product = products.find(p => p.id === item.id);
-    if (product) {
-      total += product.price * item.qty;
-      cartDiv.innerHTML += `
-        <p>${product.name} x ${item.qty}</p>
-      `;
-    }
+    if (!product) return;
+
+    total += product.price * item.qty;
+    cartDiv.innerHTML += `<p>${product.name} x ${item.qty}</p>`;
   });
 
   cartDiv.innerHTML += `<strong>Total : ${total} €</strong>`;
 }
 
 async function loadProducts() {
-  const res = await fetch("https://ecommerce-site-nij4.onrender.com/products");
-  products = await res.json();
+  try {
+    const res = await fetch("https://ecommerce-site-nij4.onrender.com/products");
+    products = await res.json();
+  } catch (e) {
+    alert("❌ Backend inaccessible");
+    return;
+  }
 
   const container = document.getElementById("products");
   container.innerHTML = "";
